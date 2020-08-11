@@ -3,7 +3,8 @@ package com.example.lolhistory.retrofit;
 public class BaseUrl {
 
     static final String RIOT_API_BASE_URL = "https://kr.api.riotgames.com/";
-    static final String RIOT_API_KEY = "RGAPI-d61c14bb-f74b-494a-99ab-5e9a9c64af71";
+    // Riot API Key 입력
+    static final String RIOT_API_KEY = "";
 
     static final String RIOT_API_GET_SUMMONER_BY_ENCRYPTION_SUMMONER_ID = "lol/summoner/v4/summoners/";
     static final String RIOT_API_GET_SUMMONER = "lol/summoner/v4/summoners/by-name/";
