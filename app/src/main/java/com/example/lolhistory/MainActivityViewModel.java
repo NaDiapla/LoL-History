@@ -74,6 +74,7 @@ public class MainActivityViewModel extends ViewModel {
                     @Override
                     public void onSuccess(SummonerIDInfo idInfo) {
                         summonerIDInfo = idInfo;
+                        summonerName = summonerIDInfo.getSummonerName();
                         getSummonerRankInfo(idInfo.getSummonerId());
                         getMatchHistoryList(idInfo.getAccountId());
                     }
@@ -174,8 +175,9 @@ public class MainActivityViewModel extends ViewModel {
 
         if (summonerRankInfos.isEmpty()) {
             summonerRankInfo = new SummonerRankInfo();
-            summonerRankInfo.setRank("UNRANKED");
-            summonerRankInfo.setTier("");
+            summonerRankInfo.setTier("UNRANKED");
+            summonerRankInfo.setRank("");
+            summonerRankInfo.setSummonerName(summonerName);
         } else {
             for (SummonerRankInfo info : summonerRankInfos) {
                 if (info.getQueueType().equals("RANKED_SOLO_5x5")) {
@@ -186,7 +188,7 @@ public class MainActivityViewModel extends ViewModel {
                     flexRankInfo = info;
                 }
             }
-            if (soloRankTier > flexRankTier) {
+            if (soloRankTier < flexRankTier) {
                 if (soloRankInfo != null)
                     summonerRankInfo = soloRankInfo;
             } else {

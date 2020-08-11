@@ -1,8 +1,9 @@
 package com.example.lolhistory;
 
+import android.content.Context;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -14,7 +15,6 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
-import androidx.core.widget.NestedScrollView;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -34,15 +34,19 @@ public class MainActivity extends AppCompatActivity {
 
     ProgressBar progressBar;
 
-    NestedScrollView scrollView;
     ConstraintLayout infoLayout;
     ImageView tierEmblem;
     TextView summonerName;
+    TextView rankType;
     TextView tier;
+    TextView lp;
     TextView winRate;
     TextView winLose;
     SwipeRefreshLayout swipeRefreshLayout;
     RecyclerView recyclerViewHistory;
+
+    private InputMethodManager inputMethodManager;
+    private boolean isVisibleInfoLayout = false;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -83,6 +87,7 @@ public class MainActivity extends AppCompatActivity {
                 recyclerViewHistory.setAdapter(historyAdapter);
                 swipeRefreshLayout.setRefreshing(false);
                 setVisibleInfoLayout(View.VISIBLE);
+                isVisibleInfoLayout = true;
             }
         });
 
@@ -97,11 +102,12 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.loading);
         progressBar.setVisibility(View.GONE);
 
-        //scrollView = findViewById(R.id.scroll_view);
         infoLayout = findViewById(R.id.info_layout);
         tierEmblem = findViewById(R.id.iv_tier_emblem);
         summonerName = findViewById(R.id.tv_summoner_name);
+        rankType = findViewById(R.id.tv_rank_type);
         tier = findViewById(R.id.tv_tier);
+        lp = findViewById(R.id.tv_lp);
         winRate = findViewById(R.id.tv_total_win_rate);
         winLose = findViewById(R.id.tv_total_win_lose);
         swipeRefreshLayout = findViewById(R.id.swipe_layout);
@@ -113,25 +119,45 @@ public class MainActivity extends AppCompatActivity {
         recyclerViewHistory.setHasFixedSize(true);
 
         setVisibleInfoLayout(View.GONE);
+
+        inputMethodManager = (InputMethodManager) this.getSystemService(Context.INPUT_METHOD_SERVICE);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (isVisibleInfoLayout) {
+            setVisibleInfoLayout(View.GONE);
+            setVisibleInputLayout(View.VISIBLE);
+            isVisibleInfoLayout = !isVisibleInfoLayout;
+        } else {
+            finish();
+        }
     }
 
     private void searchSummoner(String summonerName) {
         setVisibleProgressBar(View.VISIBLE);
-
+        inputMethodManager.hideSoftInputFromWindow(editTextSummoner.getWindowToken(), 0);
         viewModel.searchSummoner(summonerName);
     }
 
     private void setRankInfo(SummonerRankInfo summonerRankInfo) {
         setTierEmblem(summonerRankInfo.getTier());
         summonerName.setText(summonerRankInfo.getSummonerName());
-        String tierText = summonerRankInfo.getTier() + " " +summonerRankInfo.getRank();
-        tier.setText(tierText);
         if (!summonerRankInfo.getTier().equals("UNRANKED")) {
+            String tierText = summonerRankInfo.getTier() + " " +summonerRankInfo.getRank();
+            tier.setText(tierText);
+            rankType.setText(summonerRankInfo.getQueueType());
+            String leaguePoint = summonerRankInfo.getLeaguePoints() + "LP";
+            lp.setText(leaguePoint);
+
             double doubleWinRate = calcWinRate(summonerRankInfo.getWins(), summonerRankInfo.getLosses());
             winRate.setText(String.format(Locale.getDefault(), "%.2f%%", doubleWinRate));
             String winAndLooses = summonerRankInfo.getWins() + getResources().getString(R.string.win)
                     + " " + summonerRankInfo.getLosses() + getResources().getString(R.string.defeat);
             winLose.setText(winAndLooses);
+        } else {
+            tier.setText(summonerRankInfo.getTier());
+            lp.setText("");
         }
     }
 
@@ -183,7 +209,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setVisibleInfoLayout(int visible) {
-        //scrollView.setVisibility(visible);
         infoLayout.setVisibility(visible);
+        recyclerViewHistory.setVisibility(visible);
     }
 }
