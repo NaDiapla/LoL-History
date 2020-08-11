@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">LoL History</string>
+
+    <string name="input_id">소환사 이름을 입력해주세요.</string>
+    <string name="not_exist_summoner">소환사 이름과 네트워크 연결을 다시 확인해주세요.</string>
+
+    <string name="solo_rank">솔로 랭크</string>
+    <string name="flex_rank">자유 랭크</string>
+    <string name="normal_game">일반</string>
+
+    <string name="win">승</string>
+    <string name="defeat">패</string>
+
+    <string name="enter">확인</string>
+</resources>
